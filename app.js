@@ -11,7 +11,9 @@ app.use(express.json());
 
 // Todas las rutas API
 app.use('/api', rutas);
-
+app.get('/', (req, res) => {
+  res.send('✅ Backend en línea desde Render');
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor escuchando en http://0.0.0.0:${PORT}`);
