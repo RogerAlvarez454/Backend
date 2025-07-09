@@ -1,4 +1,3 @@
-// utils/generarPDF.js
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
@@ -12,7 +11,11 @@ async function generarPDF({ factura, cliente, detalles, formasPago }) {
     formasPago
   });
 
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    headless: true,
+  });
+
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: 'networkidle0' });
 
