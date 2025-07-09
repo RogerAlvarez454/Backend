@@ -12,7 +12,7 @@ async function generarPDF({ factura, cliente, detalles, formasPago }) {
   });
 
   const browser = await puppeteer.launch({
-    executablePath: await chromium.executablePath || '/usr/bin/chromium-browser',
+    executablePath: await chromium.executablePath,
     args: chromium.args,
     headless: chromium.headless,
     defaultViewport: chromium.defaultViewport,
