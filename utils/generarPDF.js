@@ -1,6 +1,5 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
-const fs = require('fs');
 const ejs = require('ejs');
 
 async function generarPDF({ factura, cliente, detalles, formasPago }) {
@@ -11,7 +10,11 @@ async function generarPDF({ factura, cliente, detalles, formasPago }) {
     formasPago
   });
 
+  const executablePath = await puppeteer.executablePath();
+  console.log('Ruta de Chromium:', executablePath);
+
   const browser = await puppeteer.launch({
+    executablePath,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
     headless: true,
   });
