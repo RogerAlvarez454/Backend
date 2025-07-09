@@ -10,7 +10,8 @@ async function generarPDF({ factura, cliente, detalles, formasPago }) {
     formasPago
   });
 
-  const executablePath = await puppeteer.executablePath();
+  // Ruta explícita al Chromium instalado en Render
+  const executablePath = '/usr/bin/chromium-browser';
   console.log('Ruta de Chromium:', executablePath);
 
   const browser = await puppeteer.launch({
