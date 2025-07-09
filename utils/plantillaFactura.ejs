@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Factura <%= factura.numero_secuencial %></title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .empresa {
+      flex: 1;
+    }
+    .empresa img {
+      max-width: 150px;
+    }
+    .info-factura {
+      text-align: right;
+      flex: 1;
+    }
+    h2 {
+      margin-bottom: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .section {
+      margin-top: 20px;
+    }
+    .totales td {
+      text-align: right;
+    }
+    .bold {
+      font-weight: bold;
+    }
+    .barcode {
+      margin-top: 10px;
+      font-size: 10px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="empresa">
+      <img src="http://localhost:3000/static/logo.png" alt="Logo Empresa" style="max-width: 150px; max-height: 80px;">
+      <p><strong>Tecno Global S.A.</strong></p>
+      <p>RUC: 0502856966001</p>
+      <p>Dirección: Av. Siempre Viva 742</p>
+      <p>Teléfono: 022223344</p>
+      <p>Correo: contacto@tecnoglobal.com</p>
+    </div>
+    <div class="info-factura">
+      <h2>Factura Nro: <%= factura.numero_secuencial %></h2>
+      <p><strong>Clave de Acceso:</strong></p>
+      <div class="barcode"><%= factura.clave_acceso %></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>👤 Cliente</h3>
+    <p><strong>Nombre:</strong> <%= cliente.nombre %></p>
+    <p><strong>RUC/Cédula:</strong> <%= cliente.ruc_cedula %></p>
+    <p><strong>Dirección:</strong> <%= cliente.direccion || 'N/A' %></p>
+    <p><strong>Teléfono:</strong> <%= cliente.telefono || 'N/A' %></p>
+    <p><strong>Correo:</strong> <%= cliente.correo || 'N/A' %></p>
+  </div>
+
+  <div class="section">
+    <h3>🧾 Detalle de Productos</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Descuento</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% detalles.forEach(d => { 
+            const subtotal = (d.precio_unitario * d.cantidad) - (d.descuento || 0);
+        %>
+        <tr>
+          <td><%= d.producto_nombre %></td>
+          <td style="text-align:center;"><%= d.cantidad %></td>
+          <td style="text-align:right;">$<%= d.precio_unitario.toFixed(2) %></td>
+          <td style="text-align:right;">$<%= (d.descuento || 0).toFixed(2) %></td>
+          <td style="text-align:right;">$<%= subtotal.toFixed(2) %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>🧮 Totales</h3>
+    <table class="totales">
+      <tbody>
+        <% 
+          const totalesIVA = {};
+          detalles.forEach(d => {
+            const porcentaje = d.iva_porcentaje || 0;
+            const subtotal = (d.precio_unitario * d.cantidad) - (d.descuento || 0);
+            if (!totalesIVA[porcentaje]) totalesIVA[porcentaje] = 0;
+            totalesIVA[porcentaje] += subtotal;
+          });
+
+          Object.entries(totalesIVA).forEach(([porcentaje, base]) => {
+            const valorIVA = base * (Number(porcentaje) / 100);
+        %>
+          <tr>
+            <td>Subtotal <%= porcentaje %>%</td>
+            <td>$<%= base.toFixed(2) %></td>
+          </tr>
+          <tr>
+            <td>IVA <%= porcentaje %>%</td>
+            <td>$<%= valorIVA.toFixed(2) %></td>
+          </tr>
+        <% }); %>
+        <tr>
+          <td>Descuento</td>
+          <td>$<%= factura.descuento.toFixed(2) %></td>
+        </tr>
+        <tr class="bold">
+          <td>Total</td>
+          <td>$<%= factura.total.toFixed(2) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>💳 Formas de Pago</h3>
+    <ul>
+      <% formasPago.forEach(p => { %>
+        <li><%= p.tipo %>: $<%= p.valor.toFixed(2) %></li>
+      <% }) %>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h3>📝 Información Adicional</h3>
+    <p><%= factura.info_adicional || 'Ninguna' %></p>
+  </div>
+
+</body>
+</html>
